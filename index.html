@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart City Potsdam</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <link rel="stylesheet" href="style.css" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- LEFT: Instructions -->
+    <aside class="instructions">
+      <p>
+Die Transformation der Stadt zu einer Smart City birgt Herausforderungen, aber auch Chancen wie eine stärkere Einbindung der Einwohner*innen in Entscheidungsprozesse. 
+Gibt es Visionen die du schon immer für deine Stadt hattest? Fehlen dir Sportplätze, Grünflächen oder konsumfreie Orte?
+      </p>
+
+      <p><strong>Aufgabe:</strong><br>
+Nimm dir einige Objekte die deinen Gedanken gut rüberbringen und ziehe sie auf die Potsdam-Karte. Mit einem Kommentar kannst du genauer erklären, was du damit meinst.
+Entdecke auch die Ideen der Anderen und vor allem: viel Spaß beim Träumen und kreativ sein.
+      </p>
+    </aside>
+
+    <!-- CENTER: Map + questions -->
+<main class="map-area">
+  <div id="map"></div>
+  <div id="dropShield"></div>
+
+  <div class="map-title">
+    <div class="map-title-box">
+      <h1>SMART CITY POTSDAM</h1>
+      <p>ein Projekt des Interaction Design Lab</p>
+    </div>
+  </div>
+
+  <div class="questions">
+    <div class="bubble bubble-green">Wo wünschst du dir mehr Grünflächen?</div>
+    <div class="bubble bubble-pink">Wie würdest du den öffentlichen Raum gestalten?</div>
+    <div class="bubble bubble-blue">Wo fühlst du dich (nicht) mitgedacht?</div>
+  </div>
+</main>
+
+
+
+    <!-- RIGHT: Drag elements -->
+    <aside class="elements">
+
+<img src="dog.png"
+     draggable="true"
+     class="draggable"
+     data-type="dog" />
+
+<img src="disco_ball.png"
+     draggable="true"
+     class="draggable"
+     data-type="disco" />
+
+<img src="mushrooms.png"
+     draggable="true"
+     class="draggable"
+     data-type="mushroom" />
+    </aside>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

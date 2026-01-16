@@ -1,0 +1,198 @@
+/* ======================
+   GLOBAL
+====================== */
+
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr 180px;
+  height: 100vh;
+}
+
+/* ======================
+   LEFT: INSTRUCTIONS
+====================== */
+
+.instructions {
+  padding: 32px;              /* more breathing room */
+  color: white;
+  text-align: left;
+
+  display: flex;
+  flex-direction: column;     /* stack items */
+  align-items: center;        /* center horizontally */
+  justify-content: center;    /* center vertically */
+
+  gap: 26px;                  /* space BETWEEN the two texts */
+
+  background: linear-gradient(
+    180deg,
+    #B83566 0%,
+    #282D6B 50%,
+    #478B70 120%
+  );
+}
+
+.instructions p {
+  max-width: 240px;           /* wider like in your screenshot */
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin: 0;                  /* IMPORTANT: don't fight gap */
+}
+
+.instructions strong {
+  font-weight: 600;
+}
+
+/* ======================
+   CENTER: MAP
+====================== */
+
+.map-area {
+  position: relative;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-tile {
+  filter: grayscale(80%) contrast(115%);
+}
+
+
+/* ======================
+   MAP TITLE
+====================== */
+
+.map-title {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 600;
+  pointer-events: none;
+}
+
+.map-title-box {
+  background: rgba(255,255,255,0.95);
+  padding: 10px 16px;
+  border-radius: 6px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.map-title-box h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+  color: #2f4db7;
+}
+
+.map-title-box p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #555;
+  font-weight: 400;
+}
+
+/* ======================
+   QUESTIONS (BUBBLES)
+====================== */
+
+.questions {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 600;
+  pointer-events: none;
+}
+
+.bubble {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.1;
+  color: white;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+}
+
+/* Bubble colors */
+.bubble-green { background: #3aa87c; }
+.bubble-pink  { background: #e84c8b; }
+.bubble-blue  { background: #2f4db7; }
+
+/* ======================
+   RIGHT: DRAGGABLE ICONS
+====================== */
+
+.draggable {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  cursor: grab;
+  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-left: 16px;
+}
+
+.draggable:active {
+  cursor: grabbing;
+}
+
+.leaflet-marker-icon {
+  transition: transform 0.2s ease;
+}
+
+/* ======================
+   DROP SHIELD
+====================== */
+
+#dropShield {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 650;
+  display: none;
+  pointer-events: none;
+}
+
+#dropShield.active {
+  display: block;
+  pointer-events: auto;
+}
+
+/* ======================
+   LEAFLET POPUP FIXES
+====================== */
+
+/* overlays must never steal clicks */
+.map-title, .questions {
+  pointer-events: none;
+}
+
+/* popup must always be clickable */
+.leaflet-popup, 
+.leaflet-popup * {
+  pointer-events: auto !important;
+}
+
+/* ensure popup sits above your overlays */
+.leaflet-popup-pane {
+  z-index: 2000 !important;
+}
