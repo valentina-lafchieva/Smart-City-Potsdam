@@ -35,6 +35,12 @@ map.on("drag", () => {
     dog: L.icon({ iconUrl: "dog.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
     disco: L.icon({ iconUrl: "disco_ball.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
     mushroom: L.icon({ iconUrl: "mushrooms.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
+    ballerina: L.icon({ iconUrl: "ballerina.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
+    guitar: L.icon({ iconUrl: "guitar.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
+    skater: L.icon({ iconUrl: "skater.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
+    bush: L.icon({ iconUrl: "bush.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
+    tree1: L.icon({ iconUrl: "tree1.png", iconSize: [48, 80], iconAnchor: [24, 24] }),
+    tree2: L.icon({ iconUrl: "tree2.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
   };
 
   // --------------------
