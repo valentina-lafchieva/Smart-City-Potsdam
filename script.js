@@ -100,81 +100,202 @@ map.on("drag", () => {
   // --------------------
   // DRAG SETUP
   // --------------------
-  document.querySelectorAll(".draggable").forEach((el) => {
-    el.addEventListener("dragstart", (e) => {
+  //let draggedType = null;
+
+// For pointer drops, we store the last pointer position while the shield is active
+let activePointerId = null;
+let lastPointerClientX = null;
+let lastPointerClientY = null;
+
+function performDrop(clientX, clientY, type) {
+  deactivateShield();
+
+  if (!type || !iconMap[type]) return;
+
+  const bounds = map.getContainer().getBoundingClientRect();
+  const x = clientX - bounds.left;
+  const y = clientY - bounds.top;
+  const latlng = map.containerPointToLatLng([x, y]);
+
+  const marker = L.marker(latlng, { icon: iconMap[type] }).addTo(map);
+  marker.comment = "";
+
+  // Bind popup (IMPORTANT: do NOT open yet)
+  marker.bindPopup(editPopup(marker.comment), {
+    closeOnClick: false,
+    autoClose: false,
+    interactive: true,
+  });
+
+  // Wire the Save button whenever popup opens
+  marker.on("popupopen", () => {
+    const popupEl = marker.getPopup().getElement();
+    if (!popupEl) return;
+
+    L.DomEvent.disableClickPropagation(popupEl);
+
+    const textarea = popupEl.querySelector(".commentInput");
+    const saveBtn = popupEl.querySelector(".saveBtn");
+
+    if (saveBtn && textarea) {
+      saveBtn.onclick = (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        marker.comment = textarea.value.trim();
+        console.log("SAVED:", marker.comment);
+
+        // Switch to read-only view (no edit button)
+        marker.setPopupContent(viewPopup(marker.comment));
+        marker.openPopup();
+      };
+    }
+  });
+
+  // Open popup after listener exists
+  marker.openPopup();
+
+  // Clicking marker later shows the saved comment
+  marker.on("click", () => {
+    marker.setPopupContent(viewPopup(marker.comment));
+    marker.openPopup();
+  });
+}
+
+// --------------------
+// DRAG SOURCE (desktop drag)
+// --------------------
+document.querySelectorAll(".draggable").forEach((el) => {
+  // Desktop drag
+  el.addEventListener("dragstart", (e) => {
+    draggedType = el.dataset.type;
+    e.dataTransfer.setData("text/plain", draggedType);
+    e.dataTransfer.effectAllowed = "copy";
+    activateShield();
+  });
+
+  el.addEventListener("dragend", () => {
+    draggedType = null;
+    deactivateShield();
+  });
+
+  // Pointer start (touch/pen)
+  el.addEventListener(
+    "pointerdown",
+    (e) => {
+      if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+
       draggedType = el.dataset.type;
-      e.dataTransfer.setData("text/plain", draggedType);
-      e.dataTransfer.effectAllowed = "copy";
+      activePointerId = e.pointerId;
+      lastPointerClientX = e.clientX;
+      lastPointerClientY = e.clientY;
+
       activateShield();
-    });
 
-    el.addEventListener("dragend", () => {
-      deactivateShield();
-    });
-  });
+      // Prevent scrolling/gesture while "dragging"
+      e.preventDefault();
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    },
+    { passive: false }
+  );
 
-  shield.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
-  });
+  // If user lifts finger on the draggable itself (rare, but handle it)
+  const endPointerFromSource = (e) => {
+    if (e.pointerId !== activePointerId) return;
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
-  // --------------------
-  // DROP => MARKER + ONE-TIME COMMENT
-  // --------------------
-  shield.addEventListener("drop", (e) => {
-    e.preventDefault();
+    // No drop here because drop should happen on shield (like desktop)
+    draggedType = null;
+    activePointerId = null;
     deactivateShield();
 
-    const type = (e.dataTransfer && e.dataTransfer.getData("text/plain")) || draggedType;
-    if (!type || !iconMap[type]) return;
+    try {
+      el.releasePointerCapture(e.pointerId);
+    } catch (_) {}
+  };
 
-    const bounds = map.getContainer().getBoundingClientRect();
-    const x = e.clientX - bounds.left;
-    const y = e.clientY - bounds.top;
-    const latlng = map.containerPointToLatLng([x, y]);
+  el.addEventListener("pointerup", endPointerFromSource);
+  el.addEventListener("pointercancel", endPointerFromSource);
+});
 
-    const marker = L.marker(latlng, { icon: iconMap[type] }).addTo(map);
-    marker.comment = "";
+// --------------------
+// DROP TARGET (shield)
+// --------------------
 
-    // Bind popup (IMPORTANT: do NOT open yet)
-    marker.bindPopup(editPopup(marker.comment), {
-      closeOnClick: false,
-      autoClose: false,
-      interactive: true,
-    });
+// Desktop drop stays as-is, but delegate to performDrop()
+shield.addEventListener("drop", (e) => {
+  e.preventDefault();
 
-    // Wire the Save button whenever popup opens
-    marker.on("popupopen", () => {
-      const popupEl = marker.getPopup().getElement();
-      if (!popupEl) return;
+  const type =
+    (e.dataTransfer && e.dataTransfer.getData("text/plain")) || draggedType;
 
-      L.DomEvent.disableClickPropagation(popupEl);
+  performDrop(e.clientX, e.clientY, type);
 
-      const textarea = popupEl.querySelector(".commentInput");
-      const saveBtn = popupEl.querySelector(".saveBtn");
+  // Clean up shared drag state
+  draggedType = null;
+  activePointerId = null;
+});
 
-      if (saveBtn && textarea) {
-        saveBtn.onclick = (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
+// Keep your existing dragover for desktop
+shield.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  if (e.dataTransfer) e.dataTransfer.dropEffect = "copy";
+});
 
-          marker.comment = textarea.value.trim();
-          console.log("SAVED:", marker.comment);
+// Pointer “drop”: track pointer movement on the shield, then drop on pointerup
+shield.addEventListener(
+  "pointermove",
+  (e) => {
+    if (e.pointerId !== activePointerId) return;
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
-          // Switch to read-only view (no edit button)
-          marker.setPopupContent(viewPopup(marker.comment));
-          marker.openPopup();
-        };
-      }
-    });
+    lastPointerClientX = e.clientX;
+    lastPointerClientY = e.clientY;
 
-    // Open popup after listener exists
-    marker.openPopup();
+    e.preventDefault();
+  },
+  { passive: false }
+);
 
-    // Clicking marker later shows the saved comment
-    marker.on("click", () => {
-      marker.setPopupContent(viewPopup(marker.comment));
-      marker.openPopup();
-    });
-  });
+shield.addEventListener(
+  "pointerup",
+  (e) => {
+    if (e.pointerId !== activePointerId) return;
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+
+    // Use the final pointer position (or last stored)
+    const clientX = e.clientX ?? lastPointerClientX;
+    const clientY = e.clientY ?? lastPointerClientY;
+
+    performDrop(clientX, clientY, draggedType);
+
+    // Clean up
+    draggedType = null;
+    activePointerId = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
+shield.addEventListener(
+  "pointercancel",
+  (e) => {
+    if (e.pointerId !== activePointerId) return;
+
+    draggedType = null;
+    activePointerId = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+
+    deactivateShield();
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
 });
