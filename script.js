@@ -252,7 +252,7 @@ document.querySelectorAll(".draggable").forEach((el) => {
     deactivateShield();
   });
 
-  // Pointer start (touch/pen)
+  // Pointer start (touch/pen only)
   el.addEventListener(
     "pointerdown",
     (e) => {
@@ -275,7 +275,6 @@ document.querySelectorAll(".draggable").forEach((el) => {
         }
       }
 
-      // Prevent scrolling/gesture while dragging on touch devices
       e.preventDefault();
     },
     { passive: false }
@@ -391,7 +390,7 @@ shield.addEventListener(
 window.addEventListener(
   "pointermove",
   (e) => {
-    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (!activePointerId) return;
     if (e.pointerId !== activePointerId) return;
     lastPointerClientX = e.clientX;
     lastPointerClientY = e.clientY;
@@ -404,7 +403,7 @@ window.addEventListener(
 window.addEventListener(
   "pointerup",
   (e) => {
-    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (!activePointerId) return;
     if (e.pointerId !== activePointerId) return;
 
     const clientX = e.clientX ?? lastPointerClientX;
@@ -421,7 +420,7 @@ window.addEventListener(
 window.addEventListener(
   "pointercancel",
   (e) => {
-    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (!activePointerId) return;
     if (e.pointerId !== activePointerId) return;
 
     draggedType = null;
