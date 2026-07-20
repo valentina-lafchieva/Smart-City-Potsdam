@@ -178,6 +178,7 @@ html, body {
   overflow-y: auto;
   background: #f7f7f7;
   border-left: 1px solid #e6e6e6;
+  touch-action: none;
 }
 
 .element-group {
@@ -246,6 +247,19 @@ html, body {
   background: white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   justify-self: center;
+  touch-action: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.drag-preview {
+  position: fixed;
+  width: 56px;
+  height: 56px;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.85;
+  transform: translate(-50%, -50%);
 }
 
 .draggable:active {

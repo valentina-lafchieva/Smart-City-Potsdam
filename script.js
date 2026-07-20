@@ -134,13 +134,48 @@ map.on("drag", () => {
   // DRAG SETUP
   // --------------------
   //let draggedType = null;
-
-// For pointer drops, we store the last pointer position while the shield is active
-let activePointerId = null;
+const supportsPointerEvents = window.PointerEvent != null;
 let lastPointerClientX = null;
 let lastPointerClientY = null;
+let dragPreview = null;
+let dragPreviewSource = null;
+
+function createDragPreview(src, clientX, clientY, sourceEl) {
+  removeDragPreview();
+  dragPreview = document.createElement('img');
+  dragPreview.src = src;
+  dragPreview.className = 'drag-preview';
+  dragPreview.style.position = 'fixed';
+  dragPreview.style.width = '56px';
+  dragPreview.style.height = '56px';
+  dragPreview.style.pointerEvents = 'none';
+  dragPreview.style.zIndex = '9999';
+  document.body.appendChild(dragPreview);
+  dragPreviewSource = sourceEl;
+  if (dragPreviewSource) dragPreviewSource.style.opacity = '0.4';
+  moveDragPreview(clientX, clientY);
+}
+
+function moveDragPreview(clientX, clientY) {
+  if (!dragPreview) return;
+  dragPreview.style.left = `${clientX}px`;
+  dragPreview.style.top = `${clientY}px`;
+  dragPreview.style.transform = 'translate(-50%, -140%)';
+}
+
+function removeDragPreview() {
+  if (dragPreviewSource) {
+    dragPreviewSource.style.opacity = '';
+    dragPreviewSource = null;
+  }
+  if (dragPreview) {
+    dragPreview.remove();
+    dragPreview = null;
+  }
+}
 
 function performDrop(clientX, clientY, type) {
+  removeDragPreview();
   deactivateShield();
 
   if (!type || !iconMap[type]) return;
@@ -225,10 +260,20 @@ document.querySelectorAll(".draggable").forEach((el) => {
 
       draggedType = el.dataset.type;
       activePointerId = e.pointerId;
+      activePointerType = e.pointerType;
       lastPointerClientX = e.clientX;
       lastPointerClientY = e.clientY;
 
       activateShield();
+      createDragPreview(el.src, e.clientX, e.clientY, el);
+
+      if (e.target.setPointerCapture) {
+        try {
+          e.target.setPointerCapture(e.pointerId);
+        } catch (err) {
+          // ignore if not supported
+        }
+      }
 
       // Prevent scrolling/gesture while dragging on touch devices
       e.preventDefault();
@@ -236,19 +281,33 @@ document.querySelectorAll(".draggable").forEach((el) => {
     { passive: false }
   );
 
-  // If user lifts finger on the draggable itself (rare, but handle it)
-  const endPointerFromSource = (e) => {
-    if (e.pointerId !== activePointerId) return;
-    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+  // Touch fallback for devices that may not reliably emit Pointer Events
+  el.addEventListener(
+    "touchstart",
+    (e) => {
+      if (supportsPointerEvents) return;
+      const touch = e.touches[0];
+      if (!touch) return;
 
-    // Cancel touch drag if the pointer ended back on the source element
-    draggedType = null;
-    activePointerId = null;
-    deactivateShield();
-  };
+      draggedType = el.dataset.type;
+      activePointerId = touch.identifier;
+      activePointerType = "touch";
+      lastPointerClientX = touch.clientX;
+      lastPointerClientY = touch.clientY;
 
-  el.addEventListener("pointerup", endPointerFromSource);
-  el.addEventListener("pointercancel", endPointerFromSource);
+      activateShield();
+      createDragPreview(el.src, touch.clientX, touch.clientY, el);
+      e.preventDefault();
+    },
+    { passive: false }
+  );
+
+  el.addEventListener("pointerup", () => {
+    // no-op: drop handled by the shield/global listeners
+  });
+  el.addEventListener("pointercancel", () => {
+    // no-op: cancel handled globally
+  });
 });
 
 // --------------------
@@ -284,6 +343,7 @@ shield.addEventListener(
 
     lastPointerClientX = e.clientX;
     lastPointerClientY = e.clientY;
+    moveDragPreview(e.clientX, e.clientY);
 
     e.preventDefault();
   },
@@ -296,7 +356,6 @@ shield.addEventListener(
     if (e.pointerId !== activePointerId) return;
     if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
-    // Use the final pointer position (or last stored)
     const clientX = e.clientX ?? lastPointerClientX;
     const clientY = e.clientY ?? lastPointerClientY;
 
@@ -325,6 +384,99 @@ shield.addEventListener(
 
     deactivateShield();
     e.preventDefault();
+  },
+  { passive: false }
+);
+
+window.addEventListener(
+  "pointermove",
+  (e) => {
+    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (e.pointerId !== activePointerId) return;
+    lastPointerClientX = e.clientX;
+    lastPointerClientY = e.clientY;
+    moveDragPreview(e.clientX, e.clientY);
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
+window.addEventListener(
+  "pointerup",
+  (e) => {
+    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (e.pointerId !== activePointerId) return;
+
+    const clientX = e.clientX ?? lastPointerClientX;
+    const clientY = e.clientY ?? lastPointerClientY;
+
+    performDrop(clientX, clientY, draggedType);
+    draggedType = null;
+    activePointerId = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+  }
+);
+
+window.addEventListener(
+  "pointercancel",
+  (e) => {
+    if (!activePointerId || e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    if (e.pointerId !== activePointerId) return;
+
+    draggedType = null;
+    activePointerId = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+    deactivateShield();
+  }
+);
+
+window.addEventListener(
+  "touchmove",
+  (e) => {
+    if (supportsPointerEvents) return;
+    if (activePointerType !== "touch") return;
+    const touch = [...e.touches].find((t) => t.identifier === activePointerId) || e.touches[0];
+    if (!touch) return;
+
+    lastPointerClientX = touch.clientX;
+    lastPointerClientY = touch.clientY;
+    moveDragPreview(touch.clientX, touch.clientY);
+    e.preventDefault();
+  },
+  { passive: false }
+);
+
+window.addEventListener(
+  "touchend",
+  (e) => {
+    if (supportsPointerEvents) return;
+    if (activePointerType !== "touch") return;
+    const touch = [...e.changedTouches].find((t) => t.identifier === activePointerId) || e.changedTouches[0];
+    if (!touch) return;
+
+    performDrop(touch.clientX, touch.clientY, draggedType);
+    draggedType = null;
+    activePointerId = null;
+    activePointerType = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+  },
+  { passive: false }
+);
+
+window.addEventListener(
+  "touchcancel",
+  (e) => {
+    if (supportsPointerEvents) return;
+    if (activePointerType !== "touch") return;
+    draggedType = null;
+    activePointerId = null;
+    activePointerType = null;
+    lastPointerClientX = null;
+    lastPointerClientY = null;
+    deactivateShield();
   },
   { passive: false }
 );
