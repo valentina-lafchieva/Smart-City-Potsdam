@@ -134,6 +134,10 @@ html, body {
 }
 
 .bubble {
+  pointer-events: auto;
+}
+
+.bubble {
   padding: 10px 14px;
   border-radius: 10px;
   font-size: 13px;

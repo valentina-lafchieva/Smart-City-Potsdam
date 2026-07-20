@@ -230,11 +230,8 @@ document.querySelectorAll(".draggable").forEach((el) => {
 
       activateShield();
 
-      // Prevent scrolling/gesture while "dragging"
+      // Prevent scrolling/gesture while dragging on touch devices
       e.preventDefault();
-      try {
-        el.setPointerCapture(e.pointerId);
-      } catch (_) {}
     },
     { passive: false }
   );
@@ -244,14 +241,10 @@ document.querySelectorAll(".draggable").forEach((el) => {
     if (e.pointerId !== activePointerId) return;
     if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
 
-    // No drop here because drop should happen on shield (like desktop)
+    // Cancel touch drag if the pointer ended back on the source element
     draggedType = null;
     activePointerId = null;
     deactivateShield();
-
-    try {
-      el.releasePointerCapture(e.pointerId);
-    } catch (_) {}
   };
 
   el.addEventListener("pointerup", endPointerFromSource);
