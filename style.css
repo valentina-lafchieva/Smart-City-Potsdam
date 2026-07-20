@@ -23,7 +23,7 @@ html, body {
 
 .app {
   display: grid;
-  grid-template-columns: 260px 1fr 180px;
+  grid-template-columns: 260px 1fr 320px;
   height: 100vh;
 }
 
@@ -143,6 +143,23 @@ html, body {
   box-shadow: 0 4px 10px rgba(0,0,0,0.18);
 }
 
+/* Touch-friendly adjustments applied only for touch/coarse pointers */
+@media (pointer: coarse) {
+  .draggable {
+    touch-action: none; /* allow pointer events for custom drag handling */
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #dropShield {
+    touch-action: none;
+  }
+
+  .bubble {
+    touch-action: manipulation; /* allow taps while preserving scroll gestures */
+  }
+}
+
 /* Bubble colors */
 .bubble-green { background: #3aa87c; }
 .bubble-pink  { background: #e84c8b; }
@@ -152,14 +169,79 @@ html, body {
    RIGHT: DRAGGABLE ICONS
 ====================== */
 
+.elements {
+  padding: 16px 12px;
+  overflow-y: auto;
+  background: #f7f7f7;
+  border-left: 1px solid #e6e6e6;
+}
+
+.element-group {
+  margin-bottom: 18px;
+}
+
+.element-group h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #444;
+}
+
+.element-group-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+/* Sidebar filter header (appears when a question is clicked) */
+.filter-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 6px;
+  border-bottom: 1px solid #eee;
+}
+
+.sidebar-back-btn {
+  background: transparent;
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.sidebar-back-btn svg {
+  display: block;
+}
+
+.sidebar-filter-bubble {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  background: transparent;
+}
+
+/* match question bubble styles for the sidebar bubble */
+.sidebar-filter-bubble.bubble-green { background: #3aa87c; color: #fff; }
+.sidebar-filter-bubble.bubble-pink { background: #e84c8b; color: #fff; }
+.sidebar-filter-bubble.bubble-blue { background: #2f4db7; color: #fff; }
+
 .draggable {
-  width: 60px;
-  height: 60px;
+  width: 100%;
+  max-width: 64px;
+  height: 64px;
   object-fit: contain;
   cursor: grab;
-  margin-bottom: 16px;
-  margin-top: 16px;
-  margin-left: 16px;
+  padding: 6px;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  justify-self: center;
 }
 
 .draggable:active {
@@ -168,6 +250,16 @@ html, body {
 
 .leaflet-marker-icon {
   transition: transform 0.2s ease;
+}
+
+/* Keep leaflet marker icons small and preserve their aspect ratio */
+.leaflet-marker-icon {
+  width: 56px !important;
+  height: auto !important;
+  max-width: 72px;
+  max-height: 88px;
+  object-fit: contain;
+  display: block;
 }
 
 /* ======================
@@ -197,6 +289,12 @@ html, body {
   pointer-events: none;
 }
 
+/* allow bubble clicks even though questions overlay the map */
+.bubble {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* popup must always be clickable */
 .leaflet-popup, 
 .leaflet-popup * {
@@ -206,4 +304,53 @@ html, body {
 /* ensure popup sits above your overlays */
 .leaflet-popup-pane {
   z-index: 2000 !important;
+}
+
+/* MarkerCluster: show a single centered green badge (no white outer ring) */
+.marker-cluster,
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background: transparent !important;
+  background-image: none !important;
+  color: #111 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 50% !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: block !important;
+  position: relative !important;
+}
+
+/* inner green circle becomes the visible cluster badge */
+.marker-cluster > div {
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  background: #3aa87c !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.marker-cluster > div > span {
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  line-height: 1 !important;
+}
+
+.marker-cluster-large {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.marker-cluster-large > div {
+  width: 40px !important;
+  height: 40px !important;
 }

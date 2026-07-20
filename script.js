@@ -19,6 +19,10 @@ const potsdamBounds = L.latLngBounds(
 map.setMaxBounds(potsdamBounds);
 map.fitBounds(potsdamBounds);
 
+  // Marker clustering: group markers when zoomed out and show counts
+  const markersCluster = L.markerClusterGroup();
+  markersCluster.addTo(map);
+
 const z = map.getZoom();
 map.setMinZoom(z);
 
@@ -32,15 +36,44 @@ map.on("drag", () => {
   // ICONS
   // --------------------
   const iconMap = {
-    dog: L.icon({ iconUrl: "dog.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
-    disco: L.icon({ iconUrl: "disco_ball.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
-    mushroom: L.icon({ iconUrl: "mushrooms.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
-    ballerina: L.icon({ iconUrl: "ballerina.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
-    guitar: L.icon({ iconUrl: "guitar.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
-    skater: L.icon({ iconUrl: "skater.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
-    bush: L.icon({ iconUrl: "bush.png", iconSize: [80, 48], iconAnchor: [24, 24] }),
-    tree1: L.icon({ iconUrl: "tree1.png", iconSize: [48, 80], iconAnchor: [24, 24] }),
-    tree2: L.icon({ iconUrl: "tree2.png", iconSize: [48, 48], iconAnchor: [24, 24] }),
+    "blue-ballerina": L.icon({ iconUrl: encodeURI("illustrations/blue/ballerina.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-child": L.icon({ iconUrl: encodeURI("illustrations/blue/child.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-dad": L.icon({ iconUrl: encodeURI("illustrations/blue/dad.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-grandpa": L.icon({ iconUrl: encodeURI("illustrations/blue/grandpa.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-guitar": L.icon({ iconUrl: encodeURI("illustrations/blue/guitar.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-guy-on-bike": L.icon({ iconUrl: encodeURI("illustrations/blue/guy_on_bike.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-hammock": L.icon({ iconUrl: encodeURI("illustrations/blue/hammock.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-man-with-dog": L.icon({ iconUrl: encodeURI("illustrations/blue/man_with_dog.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-mum": L.icon({ iconUrl: encodeURI("illustrations/blue/mum.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-old-couple": L.icon({ iconUrl: encodeURI("illustrations/blue/old_couple.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-wheelchair": L.icon({ iconUrl: encodeURI("illustrations/blue/wheelchair.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "blue-yoga": L.icon({ iconUrl: encodeURI("illustrations/blue/yoga.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+
+    "green-bush": L.icon({ iconUrl: encodeURI("illustrations/green/Bush.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-bush-2": L.icon({ iconUrl: encodeURI("illustrations/green/Bush 2.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-plant": L.icon({ iconUrl: encodeURI("illustrations/green/Plant.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-1": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 1.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-2": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 2.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-3": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 3.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-4": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 4.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-5": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 5.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-6": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 6.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-7": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 7.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tree-8": L.icon({ iconUrl: encodeURI("illustrations/green/Tree 8.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "green-tulip": L.icon({ iconUrl: encodeURI("illustrations/green/Tulip.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+
+    "pink-barbarons": L.icon({ iconUrl: encodeURI("illustrations/pink/barbarons.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-cassette-player": L.icon({ iconUrl: encodeURI("illustrations/pink/cassette_player.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-chair": L.icon({ iconUrl: encodeURI("illustrations/pink/chair.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-disco": L.icon({ iconUrl: encodeURI("illustrations/pink/disco.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-dj": L.icon({ iconUrl: encodeURI("illustrations/pink/dj.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-dog": L.icon({ iconUrl: encodeURI("illustrations/pink/dog.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-happy-dog": L.icon({ iconUrl: encodeURI("illustrations/pink/happy_dog.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-ladder": L.icon({ iconUrl: encodeURI("illustrations/pink/ladder.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-lamp": L.icon({ iconUrl: encodeURI("illustrations/pink/lamp.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-mushrooms": L.icon({ iconUrl: encodeURI("illustrations/pink/mushrooms.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-pillows": L.icon({ iconUrl: encodeURI("illustrations/pink/pillows.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
+    "pink-sofa": L.icon({ iconUrl: encodeURI("illustrations/pink/sofa.png"), iconSize: [56, 56], iconAnchor: [28, 28] }),
   };
 
   // --------------------
@@ -117,14 +150,16 @@ function performDrop(clientX, clientY, type) {
   const y = clientY - bounds.top;
   const latlng = map.containerPointToLatLng([x, y]);
 
-  const marker = L.marker(latlng, { icon: iconMap[type] }).addTo(map);
+  const marker = L.marker(latlng, { icon: iconMap[type] });
   marker.comment = "";
 
   // Bind popup (IMPORTANT: do NOT open yet)
+  // Offset the popup so it appears above the illustration instead of overlapping it
   marker.bindPopup(editPopup(marker.comment), {
     closeOnClick: false,
     autoClose: false,
     interactive: true,
+    offset: L.point(0, -36),
   });
 
   // Wire the Save button whenever popup opens
@@ -152,8 +187,11 @@ function performDrop(clientX, clientY, type) {
     }
   });
 
-  // Open popup after listener exists
-  marker.openPopup();
+  // Add marker to cluster group (will aggregate when zoomed out)
+  markersCluster.addLayer(marker);
+
+  // Open popup after listener exists (cluster may keep marker visible)
+  setTimeout(() => marker.openPopup(), 50);
 
   // Clicking marker later shows the saved comment
   marker.on("click", () => {
@@ -299,3 +337,60 @@ shield.addEventListener(
 );
 
 });
+
+// --------------------
+// SIDEBAR FILTER (click question bubbles to filter illustrations)
+// --------------------
+(() => {
+  const sidebar = document.querySelector(".elements");
+  if (!sidebar) return;
+
+  const filterHeader = sidebar.querySelector(".filter-header");
+  const filterBubble = filterHeader ? filterHeader.querySelector(".sidebar-filter-bubble") : null;
+  const backBtn = filterHeader ? filterHeader.querySelector(".sidebar-back-btn") : null;
+
+  function clearFilter() {
+    // show all draggable items
+    document.querySelectorAll('.elements .draggable').forEach((el) => {
+      el.style.display = '';
+    });
+    if (filterHeader) filterHeader.style.display = 'none';
+  }
+
+  function applyFilter(color, bubbleEl) {
+    document.querySelectorAll('.elements .draggable').forEach((el) => {
+      const t = el.dataset.type || '';
+      if (t.startsWith(color + '-')) {
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+
+    if (filterHeader && filterBubble) {
+      filterHeader.style.display = 'flex';
+      // copy bubble content and color class
+      filterBubble.innerHTML = bubbleEl.innerHTML;
+      // copy color class so it looks like the question bubble (bubble-green/pink/blue)
+      filterBubble.className = 'sidebar-filter-bubble';
+      bubbleEl.classList.forEach((c) => {
+        if (c.startsWith('bubble-')) filterBubble.classList.add(c);
+      });
+    }
+  }
+
+  // wire back button
+  if (backBtn) backBtn.addEventListener('click', () => clearFilter());
+
+  // map question bubbles
+  document.querySelectorAll('.bubble').forEach((b) => {
+    b.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      // determine color from class (bubble-green, bubble-pink, bubble-blue)
+      const cls = Array.from(b.classList).find((c) => c.startsWith('bubble-'));
+      if (!cls) return;
+      const color = cls.replace('bubble-', '');
+      applyFilter(color, b);
+    });
+  });
+})();

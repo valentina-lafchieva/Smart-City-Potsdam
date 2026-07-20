@@ -10,6 +10,10 @@
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
   />
 
+  <!-- MarkerCluster CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
   <link rel="stylesheet" href="style.css" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -57,59 +61,74 @@ Entdecke auch die Ideen der Anderen und vor allem: viel Spaß beim Träumen und 
 
 
 
-    <!-- RIGHT: Drag elements -->
+    <!-- RIGHT: Drag elements (green, pink, blue order; no headings) -->
     <aside class="elements">
+      <div class="filter-header" style="display:none;">
+        <button class="sidebar-back-btn" aria-label="Zurück">
+          <svg width="14" height="14" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+          </svg>
+        </button>
+        <div class="sidebar-filter-bubble"></div>
+      </div>
+      <div class="element-group">
+        <div class="element-group-items">
+          <img src="illustrations/green/Bush%202.png" draggable="true" class="draggable" data-type="green-bush-2" alt="Bush 2" />
+          <img src="illustrations/green/Bush.png" draggable="true" class="draggable" data-type="green-bush" alt="Bush" />
+          <img src="illustrations/green/Plant.png" draggable="true" class="draggable" data-type="green-plant" alt="Plant" />
+          <img src="illustrations/green/Tree%201.png" draggable="true" class="draggable" data-type="green-tree-1" alt="Tree 1" />
+          <img src="illustrations/green/Tree%202.png" draggable="true" class="draggable" data-type="green-tree-2" alt="Tree 2" />
+          <img src="illustrations/green/Tree%203.png" draggable="true" class="draggable" data-type="green-tree-3" alt="Tree 3" />
+          <img src="illustrations/green/Tree%204.png" draggable="true" class="draggable" data-type="green-tree-4" alt="Tree 4" />
+          <img src="illustrations/green/Tree%205.png" draggable="true" class="draggable" data-type="green-tree-5" alt="Tree 5" />
+          <img src="illustrations/green/Tree%206.png" draggable="true" class="draggable" data-type="green-tree-6" alt="Tree 6" />
+          <img src="illustrations/green/Tree%207.png" draggable="true" class="draggable" data-type="green-tree-7" alt="Tree 7" />
+          <img src="illustrations/green/Tree%208.png" draggable="true" class="draggable" data-type="green-tree-8" alt="Tree 8" />
+          <img src="illustrations/green/Tulip.png" draggable="true" class="draggable" data-type="green-tulip" alt="Tulip" />
+        </div>
+      </div>
 
-<img src="dog.png"
-     draggable="true"
-     class="draggable"
-     data-type="dog" />
+      <div class="element-group">
+        <div class="element-group-items">
+          <img src="illustrations/pink/barbarons.png" draggable="true" class="draggable" data-type="pink-barbarons" alt="Barbarons" />
+          <img src="illustrations/pink/cassette_player.png" draggable="true" class="draggable" data-type="pink-cassette-player" alt="Cassette player" />
+          <img src="illustrations/pink/chair.png" draggable="true" class="draggable" data-type="pink-chair" alt="Chair" />
+          <img src="illustrations/pink/disco.png" draggable="true" class="draggable" data-type="pink-disco" alt="Disco" />
+          <img src="illustrations/pink/dj.png" draggable="true" class="draggable" data-type="pink-dj" alt="DJ" />
+          <img src="illustrations/pink/dog.png" draggable="true" class="draggable" data-type="pink-dog" alt="Dog" />
+          <img src="illustrations/pink/happy_dog.png" draggable="true" class="draggable" data-type="pink-happy-dog" alt="Happy dog" />
+          <img src="illustrations/pink/ladder.png" draggable="true" class="draggable" data-type="pink-ladder" alt="Ladder" />
+          <img src="illustrations/pink/lamp.png" draggable="true" class="draggable" data-type="pink-lamp" alt="Lamp" />
+          <img src="illustrations/pink/mushrooms.png" draggable="true" class="draggable" data-type="pink-mushrooms" alt="Mushrooms" />
+          <img src="illustrations/pink/pillows.png" draggable="true" class="draggable" data-type="pink-pillows" alt="Pillows" />
+          <img src="illustrations/pink/sofa.png" draggable="true" class="draggable" data-type="pink-sofa" alt="Sofa" />
+        </div>
+      </div>
 
-<img src="disco_ball.png"
-     draggable="true"
-     class="draggable"
-     data-type="disco" />
-
-<img src="mushrooms.png"
-     draggable="true"
-     class="draggable"
-     data-type="mushroom" />
-
-<img src="ballerina.png"
-     draggable="true"
-     class="draggable"
-     data-type="ballerina" />
-
-<img src="guitar.png"
-     draggable="true"
-     class="draggable"
-     data-type="guitar" />
-
-<img src="skater.png"
-     draggable="true"
-     class="draggable"
-     data-type="skater" />
-    
-<img src="bush.png"
-     draggable="true"
-     class="draggable"
-     data-type="bush" />
-
-<img src="tree1.png"
-     draggable="true"
-     class="draggable"
-     data-type="tree1" />
-
-<img src="tree2.png"
-     draggable="true"
-     class="draggable"
-     data-type="tree2" />
+      <div class="element-group">
+        <div class="element-group-items">
+          <img src="illustrations/blue/ballerina.png" draggable="true" class="draggable" data-type="blue-ballerina" alt="Ballerina" />
+          <img src="illustrations/blue/child.png" draggable="true" class="draggable" data-type="blue-child" alt="Child" />
+          <img src="illustrations/blue/dad.png" draggable="true" class="draggable" data-type="blue-dad" alt="Dad" />
+          <img src="illustrations/blue/grandpa.png" draggable="true" class="draggable" data-type="blue-grandpa" alt="Grandpa" />
+          <img src="illustrations/blue/guitar.png" draggable="true" class="draggable" data-type="blue-guitar" alt="Guitar" />
+          <img src="illustrations/blue/guy_on_bike.png" draggable="true" class="draggable" data-type="blue-guy-on-bike" alt="Guy on bike" />
+          <img src="illustrations/blue/hammock.png" draggable="true" class="draggable" data-type="blue-hammock" alt="Hammock" />
+          <img src="illustrations/blue/man_with_dog.png" draggable="true" class="draggable" data-type="blue-man-with-dog" alt="Man with dog" />
+          <img src="illustrations/blue/mum.png" draggable="true" class="draggable" data-type="blue-mum" alt="Mum" />
+          <img src="illustrations/blue/old_couple.png" draggable="true" class="draggable" data-type="blue-old-couple" alt="Old couple" />
+          <img src="illustrations/blue/wheelchair.png" draggable="true" class="draggable" data-type="blue-wheelchair" alt="Wheelchair" />
+          <img src="illustrations/blue/yoga.png" draggable="true" class="draggable" data-type="blue-yoga" alt="Yoga" />
+        </div>
+      </div>
     </aside>
 
   </div>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
